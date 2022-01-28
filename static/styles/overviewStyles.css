@@ -1,0 +1,63 @@
+p, h1 {
+    color: red;
+}
+
+div {
+    background-color: black;
+    border-color: orange;
+    border-width: 6px;
+    border-radius: 6px;
+    border-style: solid;
+}
+
+.rowFlex {
+display: flex;
+flex-direction: row;
+}
+
+.columnFlex {
+display: flex;
+flex-direction: column;
+}
+
+.horizCenter {
+    margin:auto;
+}
+
+.blackBackground {
+background-color: black;
+}
+
+.brownBackground {
+background-color: brown;
+}
+
+.full {
+    width: 100%;
+}
+
+.sevenFive {
+   width: 75%;
+}
+
+.half {
+width: 50%;
+}
+
+.quarter {
+width: 25%;
+}
+
+.eighth {
+width: 8%;
+}
+
+* {
+    min-height: 20px;
+    height: auto;
+}
+
+header {
+display: flex;
+column-gap: 20px;
+}

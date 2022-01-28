@@ -1,0 +1,30 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SpendFriends</title>
+
+  <link rel="stylesheet" href="../static/styles/overviewStyles.css">
+
+</head>
+
+<body>
+  <header>
+    <p><a href={{url_for('homePage')}}>SpendFriends</a></p>
+    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
+    <p><a href={{url_for('listsPage')}}>Lists</a></p>
+    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
+  </header>
+  <h2>Username:</h2>
+  <input type="text"><br><br>
+  <h2>Password:</h2>
+  <input type="text"><br><br>
+  <input type="submit" value="Submit">
+  <script src="js/scripts.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SpendFriends</title>
+
+  <link rel="stylesheet" href="../static/styles/overviewStyles.css">
+
+</head>
+
+<body>
+  <header>
+    <p><a href={{url_for('homePage')}}>SpendFriends</a></p>
+    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
+    <p><a href={{url_for('listsPage')}}>Lists</a></p>
+    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
+  </header>
+  <div class="wholeBox columnFlex sevenFive horizCenter">
+    <p>wholeBox</p>
+    <div class="moneyInfo columnFlex full">
+      <div class="incomeTitleBox full"><p>incomeTitleBox</p></div>
+      <div class="incomeContainer rowFlex full">
+        <div class="incomeNames half"><p>incomeNames</p></div>
+        <div class="incomeAmounts half"><p>incomeAmounts</p></div>
+      </div>
+      <div class="expenseTitleBox full"><p>expenseTitleBox</p></div>
+      <div class="expenseContainer rowFlex full">
+        <div class="expenseNames half"><p>expenseNames</p></div>
+        <div class="expenseAmounts half"><p>expenseAmounts</p></div>
+      </div>
+      <div class="totalContainer rowFlex full">
+        <div class="totalName half"><p>totalName</p></div>
+        <div class="totalAmount half"><p>totalAmount</p></div>
+      </div>
+    </div>
+    <div class="buttonBox rowFlex full">
+      <p>buttonBox</p>
+      <div class="ExpenseButton quarter"><p>ExpenseButton</p></div>
+      <div class="IncomeButton quarter"><p>IncomeButton</p></div>
+    </div>
+  </div>
+  <script src="js/scripts.js"></script>
+</body>
+
+</html>
