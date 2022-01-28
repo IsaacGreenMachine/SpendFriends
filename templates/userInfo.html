@@ -14,14 +14,12 @@
 
 <body>
   <header>
+    <p><a href={{url_for('homePage', username=username)}}>SpendFriends</a></p>
+    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
+    <p><a href={{url_for('listsPage')}}>Lists</a></p>
+    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
   </header>
-  <form method="POST">
-  <p>Username:</p>
-  <input name="username"><br><br>
-  <p>Password:</p>
-  <input name="password"><br><br>
-  <input type="submit">
-</form>
+    <h1>{{ userInfo }}</h1>
   <script src="js/scripts.js"></script>
 </body>
 
