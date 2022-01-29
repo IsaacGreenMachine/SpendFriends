@@ -55,8 +55,8 @@
       </div>
     </div>
     <div class="buttonBox rowFlex full">
-      <div class="ExpenseButton quarter"><p>Add Expense</p></div>
-      <div class="IncomeButton quarter"><p>Add Income</p></div>
+      <div class="ExpenseButton quarter"><p><a href={{url_for('addExpense', username=username)}}>+Add Expense</a></p></div>
+      <div class="IncomeButton quarter"><p><a href={{url_for('addIncome', username=username)}}>+Add Income</a></p></div>
     </div>
   </div>
   <h1>{{ userData }}</h1>
