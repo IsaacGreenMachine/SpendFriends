@@ -14,10 +14,6 @@
 
 <body>
   <header>
-    <p><a href={{url_for('homePage', username=username)}}>SpendFriends</a></p>
-    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
-    <p><a href={{url_for('listsPage')}}>Lists</a></p>
-    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
   </header>
     {% for user in users %}
     <h1>{{ user }}</h1>

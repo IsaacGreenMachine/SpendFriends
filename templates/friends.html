@@ -15,11 +15,20 @@
 <body>
   <header>
     <p><a href={{url_for('homePage', username=username)}}>SpendFriends</a></p>
-    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
+    <p><a href={{url_for('friendsPage', username=username)}}>Friends</a></p>
     <p><a href={{url_for('listsPage')}}>Lists</a></p>
     <p><a href={{url_for('settingsPage')}}>Settings</a></p>
   </header>
-    <h1>FRIENDS!</h1>
+  <p>Friends List:</p>
+  {% for i in friendsInfo %}
+  <p>{{ i.get('username') }}</p>
+  {% endfor %}
+  <form method="POST">
+    <p>Add Friends!</p>
+    <p>Friend's Username:</p>
+    <input name="friendUserName"><br><br>
+    <input type="submit">
+  </form>
   <script src="js/scripts.js"></script>
 </body>
 

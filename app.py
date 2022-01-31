@@ -12,6 +12,7 @@ from uuid import uuid4
 from matplotlib.font_manager import json_dump
 app = Flask(__name__)
 con = sqlite3.connect('example.db', check_same_thread=False)
+con.row_factory = sqlite3.Row
 cur = con.cursor()
 
 @app.route('/', strict_slashes=False)
@@ -38,9 +39,8 @@ def loginPagePost():
 @app.route('/overview/<username>', strict_slashes=False)
 def homePage(username):
     '''This method creates a route and gives it some text'''
-    userData = cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0]
-    expenses = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0][4])
-    incomes = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0][5])
+    expenses = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0]['expenses'])
+    incomes = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0]['incomes'])
     incomeSum = 0
     for i in incomes:
         incomeSum+= i[1]
@@ -50,7 +50,7 @@ def homePage(username):
     round(incomeSum, 2)
     round(expenseSum, 2)
     totalSum = round((incomeSum - expenseSum), 2)
-    return render_template('overview.html', userData=userData, username=username, expenses=expenses, incomes=incomes, incomeSum=incomeSum, expenseSum=expenseSum, totalSum=totalSum)
+    return render_template('overview.html', username=username, expenses=expenses, incomes=incomes, incomeSum=incomeSum, expenseSum=expenseSum, totalSum=totalSum)
 
 @app.route('/overview/<username>/addExpense', strict_slashes=False)
 def addExpense(username):
@@ -76,10 +76,28 @@ def addIncomePost(username):
     con.commit()
     return redirect('/overview/{}'.format(username))
 
-@app.route('/friends', strict_slashes=False)
-def friendsPage():
+@app.route('/<username>/friends', strict_slashes=False)
+def friendsPage(username):
     '''This method creates a route and gives it some text'''
-    return render_template('friends.html')
+    friendsInfo=json.loads(cur.execute('SELECT friends FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
+    for i in friendsInfo:
+        print(i.get('username'))
+    return render_template('friends.html', friendsInfo=friendsInfo, username=username)
+
+@app.route('/<username>/friends', methods=['POST'], strict_slashes=False)
+def friendsPagePost(username):
+    '''This method creates a route and gives it some text'''
+    if cur.execute('SELECT username FROM users WHERE username = "{}"'.format(request.form['friendUserName'])).fetchall() == []:
+        return "This user does not exist"
+    else:
+        friendsList = json.loads(cur.execute('SELECT friends FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
+        friendUserName = request.form['friendUserName']
+        friendId = cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(friendUserName)).fetchall()[0][0]
+        friendsList.append({"username": friendUserName, "user_id": friendId})
+        cur.execute("UPDATE users SET friends = '{}' WHERE username = '{}'".format(json.dumps(friendsList), username))
+        con.commit()
+        return redirect('/overview/{}'.format(username))
+
 
 @app.route('/lists', strict_slashes=False)
 def listsPage():
@@ -91,7 +109,7 @@ def settingsPage():
     '''This method creates a route and gives it some text'''
     return render_template('settings.html')
 
-@app.route('/user/<username>', strict_slashes=False)
+@app.route('/api/user/<username>', strict_slashes=False)
 def displayUserInfo(username=None):
     '''displays info from SQLite about user'''
     if username is not None:
@@ -100,9 +118,9 @@ def displayUserInfo(username=None):
     else:
         return render_template('Username / Password not found')
 
-@app.route('/users/', strict_slashes=False)
+@app.route('/api/users/', strict_slashes=False)
 def displayUsers():
-    '''displays info from SQLite about user'''
+    '''displays info from SQLite about users'''
     users = cur.execute('SELECT * FROM users').fetchall()
     return render_template("users.html", users=users)
 
@@ -114,12 +132,26 @@ def createUser(username, password):
 @app.route('/loginPage/createUser/<username>/<password>', methods=['POST'], strict_slashes=False)
 def createUserPost(username, password):
     '''displays info from SQLite about user'''
-    cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '', '{}', '{}', '')".format(username, password, uuid.uuid4(), json.dumps([]), json.dumps([])))
+    cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '', '{}', '{}', '{}', '')".format(username, password, str(uuid.uuid4()), json.dumps([]), json.dumps([]), json.dumps([])))
     con.commit()
     return redirect('/overview/{}'.format(username))
 
+@app.route('/api/users')
+def apiDisplayUsers():
+    userList = []
+    response = cur.execute('SELECT * FROM users').fetchall()
+    for r in response:
+        userDic = {r.keys()[i]: r[i] for i in range(len(r))}
+        userList.append(userDic)
+    return(json.dumps(userList))
 
 
+@app.route('/api/users/<username>')
+def apiDisplayUser(username):
+    response = cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()
+    for r in response:
+        userDic = {r.keys()[i]: r[i] for i in range(len(r))}
+    return(json.dumps(userDic))
 
 if __name__ == '__main__':
     '''this method sets everything to work on 0.0.0.0'''
