@@ -80,8 +80,6 @@ def addIncomePost(username):
 def friendsPage(username):
     '''This method creates a route and gives it some text'''
     friendsInfo=json.loads(cur.execute('SELECT friends FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
-    for i in friendsInfo:
-        print(i.get('username'))
     return render_template('friends.html', friendsInfo=friendsInfo, username=username)
 
 @app.route('/<username>/friends', methods=['POST'], strict_slashes=False)
@@ -96,7 +94,7 @@ def friendsPagePost(username):
         friendsList.append({"username": friendUserName, "user_id": friendId})
         cur.execute("UPDATE users SET friends = '{}' WHERE username = '{}'".format(json.dumps(friendsList), username))
         con.commit()
-        return redirect('/overview/{}'.format(username))
+        return redirect('/<username>/friends')
 
 
 @app.route('/lists', strict_slashes=False)
@@ -109,20 +107,26 @@ def settingsPage():
     '''This method creates a route and gives it some text'''
     return render_template('settings.html')
 
-@app.route('/api/user/<username>', strict_slashes=False)
+@app.route('/api/users/<username>', strict_slashes=False)
 def displayUserInfo(username=None):
     '''displays info from SQLite about user'''
+    response = cur.execute('SELECT * FROM users where username = "{}"'.format(username)).fetchall()
     if username is not None:
-        userInfo = cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()
-        return render_template("userInfo.html", userInfo=userInfo)
+        for r in response:
+            dic = {r.keys()[i]: r[i] for i in range(len(r))}
+        return (json.dumps(dic))
     else:
-        return render_template('Username / Password not found')
+        return('user not found')
 
 @app.route('/api/users/', strict_slashes=False)
 def displayUsers():
     '''displays info from SQLite about users'''
-    users = cur.execute('SELECT * FROM users').fetchall()
-    return render_template("users.html", users=users)
+    usersList = []
+    response = cur.execute('SELECT * FROM users').fetchall()
+    for r in response:
+        dic = {r.keys()[i]: r[i] for i in range(len(r))}
+        usersList.append(dic)
+    return(json.dumps(usersList))
 
 @app.route('/loginPage/createUser/<username>/<password>', strict_slashes=False)
 def createUser(username, password):
