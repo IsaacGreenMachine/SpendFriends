@@ -1,0 +1,143 @@
+* {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #f6f6f6;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+    column-gap: 20px;
+    height: 60px;
+    padding: 0 20px;
+    background-color: #a783c9;
+}
+
+.middleColumnContainer {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    width: 60%;
+    min-width: 500px;
+}
+
+.menuBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 40px;
+    background-color: #d0bce3;
+    height: 60px;
+    width: 100%;
+    border-radius: 10px;
+    border: solid black 6px;
+    padding: 0 20px;
+}
+
+.transactionData {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.transactionData > * {
+    background-color: #d0bce3;
+    width: 100%;
+    height: 60px;
+    border: solid black;
+    border-width: 3px 6px;
+    text-align: center;
+    color: #f6f6f6
+}
+
+.transactionData > :first-child {
+    border-radius: 10px 10px 0 0;
+    border-width: 6px 6px 3px 6px;
+}
+
+.transactionData > :last-child {
+    border-radius: 0px 0px 10px 10px;
+    border-width: 3px 6px 6px 6px;
+}
+
+body {
+    background-color: #cbf5d5;
+}
+
+.friends {
+    margin-left: auto;
+}
+
+.transactionHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.transactionHeader > * {
+    width: 33%;
+    height: 100%;
+}
+
+.transactionHeader > :first-child {
+border-right: solid black 6px;
+}
+
+.transactionHeader > :last-child {
+border-left: solid black 6px;
+}
+
+.addExpensePopUp {
+    z-index: 2;
+    height: 450px;
+    width: 60%;
+    background-color: #a783c9;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+}
+
+.addIncomePopUp {
+    z-index: 2;
+    height: 450px;
+    width: 60%;
+    background-color: #a783c9;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+}
+
+.addExpensePopUp > * {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.addIncomePopUp > * {
+    text-align: center;
+    margin: 0 auto;
+}
+
+input {
+    color: black;
+}
+
+.x {
+margin-left: auto;
+margin-right: 20px;
+margin-top: 10px;
+height: 10px;
+width: 10px;
+}

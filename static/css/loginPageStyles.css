@@ -1,0 +1,35 @@
+* {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #f6f6f6;
+    font-weight: bold;
+    font-size: 20px;
+}
+.centerBox {
+    display: flex;
+    flex-direction: column;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loginBox {
+    background-color: #a783c9;
+    width: 60%;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+body {
+    background-color: #cbf5d5;
+}
+
+h1 {
+    text-align: center;
+    font-size: 70px;
+}
+
+input {
+    color:black;
+}

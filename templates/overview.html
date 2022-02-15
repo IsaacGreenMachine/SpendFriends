@@ -8,58 +8,63 @@
 
   <title>SpendFriends</title>
 
-  <link rel="stylesheet" href="../static/styles/overviewStyles.css">
+  <link rel="stylesheet" href="../static/css/overviewStyles.css">
 
 </head>
 
 <body>
   <header>
-    <p><a href={{url_for('homePage', username=username)}}>SpendFriends</a></p>
-    <p><a href={{url_for('friendsPage', username=username)}}>Friends</a></p>
-    <p><a href={{url_for('listsPage')}}>Lists</a></p>
-    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
+    <p><a href={{url_for('homePage')}}>SpendFriends</a></p>
+    <a href={{url_for('friendsPage')}} class="friends"><img src="../static/images/FriendsLogo.png" alt="Friends" style="width:40px;height:40px;"></a>
+    <a href={{url_for('listsPage')}}><img src="../static/images/Lists.png" alt="Lists" style="width:40px;height:40px;"></a>
+    <a href={{url_for('settingsPage')}} class="profile"><img src="../static/images/Settings.png" alt="Settings" style="width:40px;height:40px;"></a>
   </header>
-  <div class="wholeBox columnFlex sevenFive horizCenter">
-    <div class="moneyInfo columnFlex full">
-      <div class="incomeTitleBox full"><p>income:</p></div>
-      <div class="incomeContainer rowFlex full">
-        <div class="incomeNames half">
-          {% for i in incomes %}
-          <p>{{ i[0] }}</p>
-          {% endfor %}
-        </div>
-        <div class="incomeAmounts half">
-          {% for i in incomes %}
-          <p>{{ i[1] }}</p>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="incomeTotal full"><p> Income Total: {{ incomeSum }} </p></div>
-      <div class="expenseTitleBox full"><p>expenses:</p></div>
-      <div class="expenseContainer rowFlex full">
-        <div class="expenseNames half">
-          {% for i in expenses %}
-          <p>{{ i[0] }}</p>
-          {% endfor %}
-        </div>
-        <div class="expenseAmounts half">
-          {% for i in expenses %}
-          <p>{{ i[1] }}</p>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="expenseTotal full"><p> Expense Total: {{ expenseSum }} </p></div>
-      <div class="totalContainer rowFlex full">
-        <div class="totalName half"><p>total:</p></div>
-        <div class="totalAmount half"><p>{{ totalSum }}</p></div>
-      </div>
+  <div class="addExpensePopUp">
+    <form class="form-horizontal" method="POST">
+      <div class="x">x</div>
+      <p>Expense Name:</p>
+      <input name="expName"><br><br>
+      <p>Expense Amount:</p>
+      <label class="control-label" for="expAmt">$</label>
+      <input name="expAmt"><br><br>
+      <p>Expense Category:</p>
+      <input name="expCat"><br><br>
+      <input type="submit">
+    </form>
+  </div>
+  <div class="addIncomePopUp">
+    <form class="form-horizontal" method="POST">
+      <div class="x">x</div>
+      <p>Income Name:</p>
+      <input name="incName"><br><br>
+      <p>Income Amount:</p>
+      <label class="control-label" for="incAmt">$</label>
+      <input name="incAmt"><br><br>
+      <p>Income Category:</p>
+      <input name="incCat"><br><br>
+      <input type="submit">
+    </form>
+  </div>
+  <div class="middleColumnContainer">
+    <div class="menuBar">
+      <div class="addExpense">(Add Expense+)</div> <div class="addIncome">(Add Income+)</div> <div>(Categories)</div> <div>(Filter)</div> <div>(Edit)</div>
     </div>
-    <div class="buttonBox rowFlex full">
-      <div class="ExpenseButton quarter"><p><a href={{url_for('addExpense', username=username)}}>+Add Expense</a></p></div>
-      <div class="IncomeButton quarter"><p><a href={{url_for('addIncome', username=username)}}>+Add Income</a></p></div>
+    <div class="transactionData">
+      <div class="filterName"><p>Month</p></div>
+      <div class="transactionHeader">
+        <div><p>Income</p></div>
+        <div><p>Expenses</p></div>
+        <div><p>All</p></div>
+      </div>
+        <div><p>someTransactionHere</p></div>
+        <div><p>someTransactionHere</p></div>
+        <div class="total"><p>total: </p></div>
+      </div>
+
     </div>
   </div>
-  <script src="js/scripts.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../static/scripts/mainJs.js"></script>
 </body>
 
 </html>

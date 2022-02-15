@@ -11,6 +11,7 @@ con.row_factory = sqlite3.Row
 cur = con.cursor()
 
 con.execute('DROP TABLE IF EXISTS users')
+con.execute('DROP TABLE IF EXISTS lists')
 con.execute('DROP TABLE IF EXISTS expenses')
 con.execute('DROP TABLE IF EXISTS incomes')
 
@@ -26,11 +27,24 @@ cur.execute('''CREATE TABLE users(
     settings TEXT
     )''')
 
-# Insert a row of data
+cur.execute('''CREATE TABLE lists(
+    list_name TEXT NOT NULL,
+    list_id TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    owner_name TEXT NOT NULL,
+    categories TEXT,
+    expenses TEXT,
+    incomes TEXT,
+    shared_users TEXT,
+    settings TEXT
+    )''')
+
+isaacUserid = uuid.uuid4()
+# Create user isaacUser
 cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
     "isaacUser",
     "ivg123",
-    str(uuid.uuid4()),
+    str(isaacUserid),
     json.dumps([]),
     json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
     json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
@@ -39,10 +53,25 @@ cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', 
     )
 )
 
+# Create user user1
 cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
     "user1",
     "test1",
     str(uuid.uuid4()),
+    json.dumps([]),
+    json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
+    json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
+    json.dumps([]),
+    json.dumps([])
+    )
+)
+
+# Create list isaacList1
+cur.execute("INSERT INTO lists VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+    "isaacList",
+    str(uuid.uuid4()),
+    str(isaacUserid),
+    "isaacUser",
     json.dumps([]),
     json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
     json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
@@ -57,10 +86,15 @@ response = cur.execute('SELECT * FROM users where username = "{}"'.format("isaac
 #print(dir(response))
 for r in response:
     dic = {r.keys()[i]: r[i] for i in range(len(r))}
-    print(dic)
+    #print(dic)
     #if "isaacUser" in i:
         #print("YUP!")
+for r in cur.execute('SELECT * FROM lists').fetchall()[0]:
+    print(r)
 
+print(cur.execute("SELECT user_id FROM users where username = '{}'".format('isaacUser')).fetchall()[0][0])
+
+print(cur.execute('SELECT * FROM users where username = "{}"'.format("isaacUserhaha")).fetchall())
 #lists all tables
 #print(con.execute('SELECT name FROM sqlite_master').fetchall())
 

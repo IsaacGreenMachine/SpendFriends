@@ -1,0 +1,65 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SpendFriends</title>
+
+  <link rel="stylesheet" href="../static/css/overviewStyles.css">
+
+</head>
+
+<body>
+  <header>
+    <p><a href={{url_for('homePage')}}>SpendFriends</a></p>
+    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
+    <p><a href={{url_for('listsPage')}}>Lists</a></p>
+    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
+  </header>
+  <div class="wholeBox columnFlex sevenFive horizCenter">
+    <div class="moneyInfo columnFlex full">
+      <div class="incomeTitleBox full"><p>income:</p></div>
+      <div class="incomeContainer rowFlex full">
+        <div class="incomeNames half">
+          {% for i in incomes %}
+          <p>{{ i[0] }}</p>
+          {% endfor %}
+        </div>
+        <div class="incomeAmounts half">
+          {% for i in incomes %}
+          <p>{{ i[1] }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="incomeTotal full"><p> Income Total: {{ incomeSum }} </p></div>
+      <div class="expenseTitleBox full"><p>expenses:</p></div>
+      <div class="expenseContainer rowFlex full">
+        <div class="expenseNames half">
+          {% for i in expenses %}
+          <p>{{ i[0] }}</p>
+          {% endfor %}
+        </div>
+        <div class="expenseAmounts half">
+          {% for i in expenses %}
+          <p>{{ i[1] }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="expenseTotal full"><p> Expense Total: {{ expenseSum }} </p></div>
+      <div class="totalContainer rowFlex full">
+        <div class="totalName half"><p>total:</p></div>
+        <div class="totalAmount half"><p>{{ totalSum }}</p></div>
+      </div>
+    </div>
+    <div class="buttonBox rowFlex full">
+      <div class="ExpenseButton quarter"><p><a href={{url_for('addExpense')}}>+Add Expense</a></p></div>
+      <div class="IncomeButton quarter"><p><a href={{url_for('addIncome')}}>+Add Income</a></p></div>
+    </div>
+  </div>
+  <script src="js/scripts.js"></script>
+</body>
+
+</html>
