@@ -12,71 +12,76 @@ cur = con.cursor()
 
 con.execute('DROP TABLE IF EXISTS users')
 con.execute('DROP TABLE IF EXISTS lists')
-con.execute('DROP TABLE IF EXISTS expenses')
-con.execute('DROP TABLE IF EXISTS incomes')
 
 # Create table
 cur.execute('''CREATE TABLE users(
     username TEXT NOT NULL,
     password TEXT NOT NULL,
     user_id TEXT PRIMARY KEY,
-    categories TEXT,
-    expenses TEXT,
-    incomes TEXT,
+    lists TEXT,
     friends TEXT,
     settings TEXT
     )''')
+# user_id : uuid.4
+# lists: ["list_id", "list_id", ...]
+# friends: ["user_id", "user_id", ...]
+# settings: []
+
 
 cur.execute('''CREATE TABLE lists(
     list_name TEXT NOT NULL,
     list_id TEXT NOT NULL,
     owner_id TEXT NOT NULL,
-    owner_name TEXT NOT NULL,
+    owner_name TEXT,
     categories TEXT,
     expenses TEXT,
     incomes TEXT,
     shared_users TEXT,
     settings TEXT
     )''')
+# list_id: uuid.4
+# owner_id: user_id
+# categories: []
+# expenses: [['exp_id', 'exp_amt', 'exp_name', 'exp_desc'], ['exp_id', 'exp_amt', 'exp_name', 'exp_desc'], ...]
+# incomes: [['exp_id', 'exp_amt', 'exp_name', 'exp_desc'], ['exp_id', 'exp_amt', 'exp_name', 'exp_desc'], ...]
+# shared_users: ['usr_id', 'usr_id', 'usr_id' ...]
+# settings: []
 
 isaacUserid = uuid.uuid4()
 # Create user isaacUser
-cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}')".format(
     "isaacUser",
     "ivg123",
     str(isaacUserid),
-    json.dumps([]),
-    json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
-    json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
-    json.dumps([{"user_id": str(uuid.uuid4()), "username": "user4"}, {"user_id": str(uuid.uuid4()), "username": "user2"}, {"user_id": str(uuid.uuid4()), "username": "user3"}]),
-    json.dumps([])
+    json.dumps([]), # lists
+    json.dumps([]), # friends
+    json.dumps([]) # settings
     )
 )
 
 # Create user user1
-cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}')".format(
     "user1",
     "test1",
     str(uuid.uuid4()),
     json.dumps([]),
-    json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
-    json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
     json.dumps([]),
     json.dumps([])
     )
 )
 
 # Create list isaacList1
+isaacList1_id = str(uuid.uuid4())
 cur.execute("INSERT INTO lists VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
     "isaacList",
-    str(uuid.uuid4()),
+    isaacList1_id,
     str(isaacUserid),
     "isaacUser",
-    json.dumps([]),
-    json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]),
-    json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]),
-    json.dumps([]),
-    json.dumps([])
+    json.dumps([]), #categories
+    json.dumps([['haircut' , 90.56, 'self care'], ['video Game' , 20, 'entertainment']]), #expenses
+    json.dumps([['work' , 100, 'full time'], ['side job' , 5, 'part time']]), #incomes
+    json.dumps([]), #shared_users
+    json.dumps([]) #settings
     )
 )
 

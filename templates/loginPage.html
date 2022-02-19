@@ -13,7 +13,7 @@
 </head>
 
 <body>
-  <form method="POST">
+  <form action="{{ url_for('loginPage') }}" method="POST">
   <div class="centerBox">
     <h1>SpendFriends</h1>
     <div class="loginBox">
@@ -22,10 +22,11 @@
       <p>Password:</p>
       <input name="password" type="password"><br><br>
       <input type="submit" value="log in">
+      <input type="submit" value="register">
     </div>
   </div>
 </form>
-  <script src="js/scripts.js"></script>
+  <script src="js/loginPage.js"></script>
 </body>
 
 </html>

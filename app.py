@@ -2,7 +2,8 @@
 '''
 this script creates a page to return hello hbnb
 '''
-from urllib import request
+from cmath import exp
+from urllib import request, response
 import uuid
 from flask import Flask, render_template, redirect, url_for, session
 from flask import request as rq
@@ -11,7 +12,6 @@ import json
 from uuid import uuid4
 from secrets import token_hex
 
-from matplotlib.font_manager import json_dump
 app = Flask(__name__)
 app.static_url_path=''
 app.static_folder='static'
@@ -33,12 +33,13 @@ def loginPage():
 @app.route('/loginPage', strict_slashes=False, methods=['POST'])
 def loginPagePost():
     '''This method creates a route and gives it some text'''
-    session['username'] = request.form['username']
-    session['password'] = request.form['password']
-    if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(request.form['username'])).fetchall() == []:
-        return redirect('/loginPage/createUser/'.format(request.form['username'], request.form['password']))
+    session['username'] = rq.form['username']
+    session['password'] = rq.form['password']
+    session['user_id'] = cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0]
+    if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall() == []:
+        return redirect('/loginPage/createUser/'.format(rq.form['username'], rq.form['password']))
     else:
-        if cur.execute('SELECT * FROM users WHERE username = "{}" AND password = "{}"'.format(request.form['username'], request.form['password'])).fetchall() == []:
+        if cur.execute('SELECT * FROM users WHERE username = "{}" AND password = "{}"'.format(rq.form['username'], rq.form['password'])).fetchall() == []:
             return "Invalid Password!"
         else:
             return redirect(url_for('homePage'))
@@ -47,8 +48,8 @@ def loginPagePost():
 def homePage():
     '''This method creates a route and gives it some text'''
     username = session['username']
-    expenses = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0]['expenses'])
-    incomes = json.loads(cur.execute('SELECT * FROM users WHERE username = "{}"'.format(username)).fetchall()[0]['incomes'])
+    expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE owner_id = "{}"'.format(session['user_id'])).fetchall()[0][0])
+    incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE owner_id = "{}"'.format(session['user_id'])).fetchall()[0][0])
     incomeSum = 0
     for i in incomes:
         incomeSum+= i[1]
@@ -68,7 +69,7 @@ def addExpense():
 def addExpensePost():
     username = session['username']
     expenses = json.loads(cur.execute('SELECT expenses FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
-    expenses.append([request.form['expName'], round(float(request.form['expAmt'].replace(',', '')), 2), request.form['expCat']])
+    expenses.append([rq.form['expName'], round(float(rq.form['expAmt'].replace(',', '')), 2), rq.form['expCat']])
     cur.execute("UPDATE users SET expenses = '{}' WHERE username = '{}'".format(json.dumps(expenses), username))
     con.commit()
     return redirect('/overview')
@@ -81,7 +82,7 @@ def addIncome():
 def addIncomePost():
     username = session['username']
     incomes = json.loads(cur.execute('SELECT incomes FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
-    incomes.append([request.form['incName'], round(float(request.form['incAmt'].replace(',', '')), 2), request.form['incCat']])
+    incomes.append([rq.form['incName'], round(float(rq.form['incAmt'].replace(',', '')), 2), rq.form['incCat']])
     cur.execute("UPDATE users SET incomes = '{}' WHERE username = '{}'".format(json.dumps(incomes), username))
     con.commit()
     return redirect('/overview'.format(username))
@@ -97,11 +98,11 @@ def friendsPage():
 def friendsPagePost():
     '''This method creates a route and gives it some text'''
     username = session['username']
-    if cur.execute('SELECT username FROM users WHERE username = "{}"'.format(request.form['friendUserName'])).fetchall() == []:
+    if cur.execute('SELECT username FROM users WHERE username = "{}"'.format(rq.form['friendUserName'])).fetchall() == []:
         return "This user does not exist"
     else:
         friendsList = json.loads(cur.execute('SELECT friends FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
-        friendUserName = request.form['friendUserName']
+        friendUserName = rq.form['friendUserName']
         friendId = cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(friendUserName)).fetchall()[0][0]
         friendsList.append({"username": friendUserName, "user_id": friendId})
         cur.execute("UPDATE users SET friends = '{}' WHERE username = '{}'".format(json.dumps(friendsList), username))
@@ -122,7 +123,7 @@ def listsPagePost():
     username = session['username']
     user_id = cur.execute("SELECT user_id FROM users where username = '{}'".format(username)).fetchall()[0][0]
     cur.execute("INSERT INTO lists VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
-    request.form['listName'],
+    rq.form['listName'],
     str(uuid.uuid4()),
     user_id,
     username,
@@ -160,7 +161,7 @@ def addListExpense(listName):
 def addListExpensePost(listName):
     username = session['username']
     expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE list_name = "{}"'.format(listName)).fetchall()[0][0])
-    expenses.append([request.form['expName'], round(float(request.form['expAmt'].replace(',', '')), 2), request.form['expCat']])
+    expenses.append([rq.form['expName'], round(float(rq.form['expAmt'].replace(',', '')), 2), rq.form['expCat']])
     cur.execute("UPDATE lists SET expenses = '{}' WHERE list_name = '{}'".format(json.dumps(expenses), listName))
     con.commit()
     return redirect('/lists/{}'.format(listName))
@@ -173,7 +174,7 @@ def addListIncome(listName):
 def addListIncomePost(listName):
     username = session['username']
     incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE list_name = "{}"'.format(listName)).fetchall()[0][0])
-    incomes.append([request.form['incName'], round(float(request.form['incAmt'].replace(',', '')), 2), request.form['incCat']])
+    incomes.append([rq.form['incName'], round(float(rq.form['incAmt'].replace(',', '')), 2), rq.form['incCat']])
     cur.execute("UPDATE lists SET incomes = '{}' WHERE list_name = '{}'".format(json.dumps(incomes), listName))
     con.commit()
     return redirect('/lists/{}'.format(listName))
@@ -277,7 +278,7 @@ def postUser():
     if settings is None:
         responseStr = responseStr + " OPTIONAL: settings "
         settings = []
-    cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(username, password, str(uuid.uuid4()), json.dumps([]), json.dumps([]), json.dumps([]), json.dumps(friends), json.dumps(settings)))
+    cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '{}', '{}', '{}')".format(username, password, str(uuid.uuid4()), json.dumps(lists), json.dumps(friends), json.dumps(settings)))
     con.commit()
     return "user created. " + responseStr
 
@@ -399,75 +400,10 @@ def postPassword(user_id=None):
         con.commit()
         return json.dumps('set user {} username to {}'.format(user_id, new_password))
 
-@app.route('/api/users/<user_id>/friends', strict_slashes=False)
-def displayUserFriends(user_id=None):
-    '''displays info from SQLite about user'''
-    response = cur.execute('SELECT friends FROM users WHERE user_id = "{}"'.format(user_id)).fetchall()
-    if response != []:
-        for r in response:
-            dic = {r.keys()[i]: r[i] for i in range(len(r))}
-        return (json.dumps(dic))
-    else:
-        return('user not found')
-
-@app.route('/api/users/<user_id>/friends', strict_slashes=False, methods=['POST'])
-def postUserFriends(user_id=None):
-    '''This method creates a route and gives it some text'''
-    request_content_type = rq.headers.get('Content-Type')
-    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
-        return "not a valid user_id"
-    jsonObj = rq.json
-    friends = jsonObj.get('friends')
-    if friends is None:
-        return "requires friends"
-    else:
-        cur.execute("UPDATE users SET friends = '{}' where user_id = '{}'".format(friends, user_id))
-    con.commit()
-    return json.dumps('set user {} friends to {}'.format(user_id, friends))
-
-###########################################
-@app.route('/api/users/<user_id>/friends', strict_slashes=False, methods=['PUT'])
-def putUserFriends(user_id=None):
-    return "not yet implemented"
-
-
-
-@app.route('/api/users/<user_id>/settings', strict_slashes=False)
-def displayUserSettings(user_id=None):
-    '''displays info from SQLite about user'''
-    response = cur.execute('SELECT settings FROM users WHERE user_id = "{}"'.format(user_id)).fetchall()
-    if response != []:
-        for r in response:
-            dic = {r.keys()[i]: r[i] for i in range(len(r))}
-        return (json.dumps(dic))
-    else:
-        return('user not found')
-
-@app.route('/api/users/<user_id>/settings', strict_slashes=False, methods=['POST'])
-def postUserSettings(user_id=None):
-    '''This method creates a route and gives it some text'''
-    request_content_type = rq.headers.get('Content-Type')
-    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
-        return "not a valid user_id"
-    jsonObj = rq.json
-    settings = jsonObj.get('settings')
-    if settings is None:
-        return "requires settings"
-    else:
-        cur.execute("UPDATE users SET settings = '{}' where user_id = '{}'".format(settings, user_id))
-    con.commit()
-    return json.dumps('set user {} settings to {}'.format(user_id, settings))
-
-###########################################
-@app.route('/api/users/<user_id>/settings', strict_slashes=False, methods=['PUT'])
-def putUserSettings(user_id=None):
-    return "not yet implemented"
-
-
 @app.route('/api/users/<user_id>/lists', strict_slashes=False)
 def displayUserLists(user_id=None):
     '''displays info from SQLite about user'''
-    response = cur.execute('SELECT * FROM lists where owner_id = "{}"'.format(user_id)).fetchall()
+    response = cur.execute('SELECT lists FROM users where user_id = "{}"'.format(user_id)).fetchall()
     if response != []:
         dicList = []
         for r in response:
@@ -476,7 +412,6 @@ def displayUserLists(user_id=None):
         return (json.dumps(dicList))
     else:
         return('user not found')
-
 
 @app.route('/api/users/<user_id>/lists', strict_slashes=False, methods=['POST'])
 def postList(user_id=None):
@@ -529,8 +464,74 @@ def postList(user_id=None):
     json.dumps(settings)
     )
     )
+    userLists = cur.execute("SELECT lists FROM users WHERE user_id = '{}'".format(user_id)).fetchall()[0][0]
+    userLists = json.loads(userLists)
+    userLists.append(list_id)
+    cur.execute("UPDATE users set lists = '{}' WHERE user_id = '{}'".format(json.dumps(userLists), user_id))
     con.commit()
     return " List created. " + returnStr
+
+@app.route('/api/users/<user_id>/friends', strict_slashes=False)
+def displayUserFriends(user_id=None):
+    '''displays info from SQLite about user'''
+    response = cur.execute('SELECT friends FROM users WHERE user_id = "{}"'.format(user_id)).fetchall()
+    if response != []:
+        for r in response:
+            dic = {r.keys()[i]: r[i] for i in range(len(r))}
+        return (json.dumps(dic))
+    else:
+        return('user not found')
+
+@app.route('/api/users/<user_id>/friends', strict_slashes=False, methods=['POST'])
+def postUserFriends(user_id=None):
+    '''This method creates a route and gives it some text'''
+    request_content_type = rq.headers.get('Content-Type')
+    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
+        return "not a valid user_id"
+    jsonObj = rq.json
+    friends = jsonObj.get('friends')
+    if friends is None:
+        return "requires friends"
+    else:
+        cur.execute("UPDATE users SET friends = '{}' where user_id = '{}'".format(friends, user_id))
+    con.commit()
+    return json.dumps('set user {} friends to {}'.format(user_id, friends))
+
+###########################################
+@app.route('/api/users/<user_id>/friends', strict_slashes=False, methods=['PUT'])
+def putUserFriends(user_id=None):
+    return "not yet implemented"
+
+@app.route('/api/users/<user_id>/settings', strict_slashes=False)
+def displayUserSettings(user_id=None):
+    '''displays info from SQLite about user'''
+    response = cur.execute('SELECT settings FROM users WHERE user_id = "{}"'.format(user_id)).fetchall()
+    if response != []:
+        for r in response:
+            dic = {r.keys()[i]: r[i] for i in range(len(r))}
+        return (json.dumps(dic))
+    else:
+        return('user not found')
+
+@app.route('/api/users/<user_id>/settings', strict_slashes=False, methods=['POST'])
+def postUserSettings(user_id=None):
+    '''This method creates a route and gives it some text'''
+    request_content_type = rq.headers.get('Content-Type')
+    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
+        return "not a valid user_id"
+    jsonObj = rq.json
+    settings = jsonObj.get('settings')
+    if settings is None:
+        return "requires settings"
+    else:
+        cur.execute("UPDATE users SET settings = '{}' where user_id = '{}'".format(settings, user_id))
+    con.commit()
+    return json.dumps('set user {} settings to {}'.format(user_id, settings))
+
+###########################################
+@app.route('/api/users/<user_id>/settings', strict_slashes=False, methods=['PUT'])
+def putUserSettings(user_id=None):
+    return "not yet implemented"
 
 @app.route('/api/users/<user_id>/lists/<list_id>', strict_slashes=False)
 def displayUserList(user_id=None, list_id=None):
@@ -707,27 +708,38 @@ def postListExpensesUpdate(user_id=None, list_id=None):
     if cur.execute("SELECT * FROM lists where list_id = '{}'".format(list_id)).fetchall() == []:
         return "not a valid list_id"
     jsonObj = rq.json
-    expenses = jsonObj.get('expenses')
-    if expenses is None:
-        return "requires expenses"
-    else:
-        cur.execute("UPDATE lists SET categories = '{}' where list_id = '{}'".format(expenses, list_id))
+    expense_amount = jsonObj.get('expense_amount')
+    if expense_amount is None:
+        return "requires expense_amount"
+    expense_name = jsonObj.get('expense_name')
+    if expense_name is None:
+        return "requires expense_name"
+    expense_description = jsonObj.get('expense_description')
+    if expense_description is None:
+        return "requires expense_description"
+    exp_list = cur.execute("SELECT expenses FROM lists where list_id = '{}'".format(list_id)).fetchall()[0][0]
+    exp_list = json.loads(exp_list)
+    exp_list.append([str(uuid.uuid4()), float(expense_amount), expense_name, expense_description])
+    cur.execute("UPDATE lists SET expenses = '{}' where list_id = '{}'".format(json.dumps(exp_list), list_id))
     con.commit()
-    return json.dumps('set list {} expenses to {}'.format(list_id, expenses))
+    return json.dumps('set list {} expenses to {}'.format(list_id, exp_list))
 
-###########################################
-@app.route('/api/users/<user_id>/lists/<list_id>/expenses', strict_slashes=False, methods=['PUT'])
-def putListExpensesUpdate(user_id=None, list_id=None):
-    return "not yet implemented"
-
-############################################
 @app.route('/api/users/<user_id>/lists/<list_id>/expenses/<expense_id>', strict_slashes=False)
 def displayUserListExpensesID(user_id=None, list_id=None, expense_id=None):
     '''displays info from SQLite about user'''
-    return "Not yet implemented"
+    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
+        return "not a valid user_id"
+    if cur.execute("SELECT * FROM lists where list_id = '{}'".format(list_id)).fetchall() == []:
+        return "not a valid list_id"
+    exp_list = cur.execute("SELECT expenses FROM lists where list_id = '{}'".format(list_id)).fetchall()[0][0]
+    exp_list = json.loads(exp_list)
+    for li in exp_list:
+        if expense_id in li:
+            return json.dumps(li)
+    return "expense not found"
 
 ############################################
-@app.route('/api/users/<user_id>/lists/<list_id>/expenses/<expense_id>', strict_slashes=False, methods=['POST'])
+@app.route('/api/users/<user_id>/lists/<list_id>/expenses/<expense_id>', strict_slashes=False, methods=['PUT'])
 def PostUserListExpensesID(user_id=None, list_id=None, expense_id=None):
     '''displays info from SQLite about user'''
     return "Not yet implemented"
@@ -752,27 +764,38 @@ def postListIncomesUpdate(user_id=None, list_id=None):
     if cur.execute("SELECT * FROM lists where list_id = '{}'".format(list_id)).fetchall() == []:
         return "not a valid list_id"
     jsonObj = rq.json
-    incomes = jsonObj.get('incomes')
-    if incomes is None:
-        return "requires incomes"
-    else:
-        cur.execute("UPDATE lists SET incomes = '{}' where list_id = '{}'".format(incomes, list_id))
+    income_amount = jsonObj.get('income_amount')
+    if income_amount is None:
+        return "requires income_amount"
+    income_name = jsonObj.get('income_name')
+    if income_name is None:
+        return "requires income_name"
+    income_description = jsonObj.get('income_description')
+    if income_description is None:
+        return "requires income_description"
+    inc_list = cur.execute("SELECT incomes FROM lists where list_id = '{}'".format(list_id)).fetchall()[0][0]
+    inc_list = json.loads(inc_list)
+    inc_list.append([str(uuid.uuid4()), float(income_amount), income_name, income_description])
+    cur.execute("UPDATE lists SET incomes = '{}' where list_id = '{}'".format(json.dumps(inc_list), list_id))
     con.commit()
-    return json.dumps('set list {} incomes to {}'.format(list_id, incomes))
+    return json.dumps('set list {} expenses to {}'.format(list_id, inc_list))
 
-###########################################
-@app.route('/api/users/<user_id>/lists/<list_id>/incomes', strict_slashes=False, methods=['PUT'])
-def putListIncomesUpdate(user_id=None, list_id=None):
-    return "not yet implemented"
-
-#############################################
 @app.route('/api/users/<user_id>/lists/<list_id>/incomes/<income_id>', strict_slashes=False)
 def displayUserListIncomesID(user_id=None, list_id=None, income_id=None):
     '''displays info from SQLite about user'''
-    return('Not implemented yet')
+    if cur.execute("SELECT * FROM users where user_id = '{}'".format(user_id)).fetchall() == []:
+        return "not a valid user_id"
+    if cur.execute("SELECT * FROM lists where list_id = '{}'".format(list_id)).fetchall() == []:
+        return "not a valid list_id"
+    inc_list = cur.execute("SELECT incomes FROM lists where list_id = '{}'".format(list_id)).fetchall()[0][0]
+    inc_list = json.loads(inc_list)
+    for li in inc_list:
+        if income_id in li:
+            return json.dumps(li)
+    return "income not found"
 
 ############################################
-@app.route('/api/users/<user_id>/lists/<list_id>/incomes/<income_id>', strict_slashes=False, methods=['POST'])
+@app.route('/api/users/<user_id>/lists/<list_id>/incomes/<income_id>', strict_slashes=False, methods=['PUT'])
 def PostUserListIncomesID(user_id=None, list_id=None, income_id=None):
     '''displays info from SQLite about user'''
     return "Not yet implemented"
@@ -864,6 +887,7 @@ PUSH request for:
 
 PUT request for:
 /api/users/<user_id> (friends and settings)
+/api/users/<user_id>/lists
 /api/users/<user_id>/friends
 /api/users/<user_id>/settings
 /api/users/<user_id>/lists/<list_id>
