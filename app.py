@@ -5,7 +5,7 @@ this script creates a page to return hello hbnb
 from cmath import exp
 from urllib import request, response
 import uuid
-from flask import Flask, render_template, redirect, url_for, session
+from flask import Flask, render_template, redirect, url_for, make_response
 from flask import request as rq
 import sqlite3
 import json
@@ -33,23 +33,24 @@ def loginPage():
 @app.route('/loginPage', strict_slashes=False, methods=['POST'])
 def loginPagePost():
     '''This method creates a route and gives it some text'''
-    session['username'] = rq.form['username']
-    session['password'] = rq.form['password']
-    session['user_id'] = cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0]
+    response = make_response(redirect(url_for('homePage')))
+    response.set_cookie('username', rq.form['username'])
+    response.set_cookie('password', rq.form['password'])
+    response.set_cookie('user_id', cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0])
     if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall() == []:
         return redirect('/loginPage/createUser/'.format(rq.form['username'], rq.form['password']))
     else:
         if cur.execute('SELECT * FROM users WHERE username = "{}" AND password = "{}"'.format(rq.form['username'], rq.form['password'])).fetchall() == []:
             return "Invalid Password!"
         else:
-            return redirect(url_for('homePage'))
+            return response
 
 @app.route('/overview', strict_slashes=False)
 def homePage():
     '''This method creates a route and gives it some text'''
-    username = session['username']
-    expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE owner_id = "{}"'.format(session['user_id'])).fetchall()[0][0])
-    incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE owner_id = "{}"'.format(session['user_id'])).fetchall()[0][0])
+    username = rq.cookies.get('username')
+    expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE owner_id = "{}"'.format(rq.cookies['user_id'])).fetchall()[0][0])
+    incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE owner_id = "{}"'.format(rq.cookies['user_id'])).fetchall()[0][0])
     incomeSum = 0
     for i in incomes:
         incomeSum+= i[1]
@@ -67,7 +68,7 @@ def addExpense():
 
 @app.route('/overview/addExpense', methods=['POST'], strict_slashes=False)
 def addExpensePost():
-    username = session['username']
+    username =  rq.cookies.get('username')
     expenses = json.loads(cur.execute('SELECT expenses FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
     expenses.append([rq.form['expName'], round(float(rq.form['expAmt'].replace(',', '')), 2), rq.form['expCat']])
     cur.execute("UPDATE users SET expenses = '{}' WHERE username = '{}'".format(json.dumps(expenses), username))
@@ -80,7 +81,7 @@ def addIncome():
 
 @app.route('/overview/addIncome', methods=['POST'], strict_slashes=False)
 def addIncomePost():
-    username = session['username']
+    username = rq.cookies.get('username')
     incomes = json.loads(cur.execute('SELECT incomes FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
     incomes.append([rq.form['incName'], round(float(rq.form['incAmt'].replace(',', '')), 2), rq.form['incCat']])
     cur.execute("UPDATE users SET incomes = '{}' WHERE username = '{}'".format(json.dumps(incomes), username))
@@ -90,14 +91,14 @@ def addIncomePost():
 @app.route('/friends', strict_slashes=False)
 def friendsPage():
     '''This method creates a route and gives it some text'''
-    username = session['username']
+    username = rq.cookies.get('username')
     friendsInfo=json.loads(cur.execute('SELECT friends FROM users WHERE username = "{}"'.format(username)).fetchall()[0][0])
     return render_template('friends.html', friendsInfo=friendsInfo, username=username)
 
 @app.route('/friends', methods=['POST'], strict_slashes=False)
 def friendsPagePost():
     '''This method creates a route and gives it some text'''
-    username = session['username']
+    username = rq.cookies.get('username')
     if cur.execute('SELECT username FROM users WHERE username = "{}"'.format(rq.form['friendUserName'])).fetchall() == []:
         return "This user does not exist"
     else:
@@ -113,14 +114,14 @@ def friendsPagePost():
 @app.route('/lists', strict_slashes=False)
 def listsPage():
     '''This method creates a route and gives it some text'''
-    username = session['username']
+    username = rq.cookies.get('username')
     lists = cur.execute("SELECT * from lists WHERE owner_name = '{}'".format(username))
     return render_template('lists.html', username=username, lists=lists)
 
 @app.route('/lists', strict_slashes=False, methods=['POST'])
 def listsPagePost():
     '''This method creates a route and gives it some text'''
-    username = session['username']
+    username = rq.cookies.get('username')
     user_id = cur.execute("SELECT user_id FROM users where username = '{}'".format(username)).fetchall()[0][0]
     cur.execute("INSERT INTO lists VALUES ('{}','{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
     rq.form['listName'],
@@ -139,7 +140,7 @@ def listsPagePost():
 
 @app.route('/lists/<listName>', strict_slashes=False)
 def listData(listName):
-    username = session['username']
+    username = rq.cookies.get('username')
     expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE owner_name = "{}" AND list_name = "{}"'.format(username, listName)).fetchall()[0][0])
     incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE owner_name = "{}" AND list_name = "{}"'.format(username, listName)).fetchall()[0][0])
     incomeSum = 0
@@ -159,7 +160,7 @@ def addListExpense(listName):
 
 @app.route('/lists/<listName>/addExpense', methods=['POST'], strict_slashes=False)
 def addListExpensePost(listName):
-    username = session['username']
+    username = rq.cookies.get('username')
     expenses = json.loads(cur.execute('SELECT expenses FROM lists WHERE list_name = "{}"'.format(listName)).fetchall()[0][0])
     expenses.append([rq.form['expName'], round(float(rq.form['expAmt'].replace(',', '')), 2), rq.form['expCat']])
     cur.execute("UPDATE lists SET expenses = '{}' WHERE list_name = '{}'".format(json.dumps(expenses), listName))
@@ -172,7 +173,7 @@ def addListIncome(listName):
 
 @app.route('/list/<listName>/addIncome', methods=['POST'], strict_slashes=False)
 def addListIncomePost(listName):
-    username = session['username']
+    username = rq.cookies.get('username')
     incomes = json.loads(cur.execute('SELECT incomes FROM lists WHERE list_name = "{}"'.format(listName)).fetchall()[0][0])
     incomes.append([rq.form['incName'], round(float(rq.form['incAmt'].replace(',', '')), 2), rq.form['incCat']])
     cur.execute("UPDATE lists SET incomes = '{}' WHERE list_name = '{}'".format(json.dumps(incomes), listName))
@@ -187,15 +188,15 @@ def settingsPage():
 @app.route('/loginPage/createUser', strict_slashes=False)
 def createUser():
     '''displays info from SQLite about user'''
-    username = session['username']
-    password = session['password']
+    username = rq.cookies.get('username')
+    password = rq.cookies.get('password')
     return render_template("createUser.html", username=username, password=password)
 
 @app.route('/loginPage/createUser', methods=['POST'], strict_slashes=False)
 def createUserPost():
     '''displays info from SQLite about user'''
-    username = session['username']
-    password = session['password']
+    username = rq.cookies.get('username')
+    password = rq.cookies.get('password')
     cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '', '{}', '{}', '{}', '')".format(username, password, str(uuid.uuid4()), json.dumps([]), json.dumps([]), json.dumps([])))
     con.commit()
     return redirect('/overview')
@@ -211,7 +212,8 @@ def createUserPost():
 
 @app.route('/api', strict_slashes=False)
 def displayAPIinfo():
-    return("""/api/users<br>
+    return("""/api/cookies<br>
+              /api/users<br>
               /api/users/(user_id)<br>
               /api/users/(user_id)/username<br>
               /api/users/(user_id)/password<br>
@@ -229,6 +231,11 @@ def displayAPIinfo():
               /api/users/(user_id)/settings<br>
             """
         )
+
+@app.route('/api/cookies', strict_slashes=False)
+def displayCookies(user_id=None):
+    '''displays info from SQLite about user'''
+    return json.dumps(rq.cookies)
 
 @app.route('/api/users', strict_slashes=False)
 def displayUsers():
@@ -778,7 +785,7 @@ def postListIncomesUpdate(user_id=None, list_id=None):
     inc_list.append([str(uuid.uuid4()), float(income_amount), income_name, income_description])
     cur.execute("UPDATE lists SET incomes = '{}' where list_id = '{}'".format(json.dumps(inc_list), list_id))
     con.commit()
-    return json.dumps('set list {} expenses to {}'.format(list_id, inc_list))
+    return json.dumps('set list {} incomes to {}'.format(list_id, inc_list))
 
 @app.route('/api/users/<user_id>/lists/<list_id>/incomes/<income_id>', strict_slashes=False)
 def displayUserListIncomesID(user_id=None, list_id=None, income_id=None):
