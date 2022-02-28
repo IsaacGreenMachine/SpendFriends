@@ -8,22 +8,26 @@
 
   <title>SpendFriends</title>
 
-  <link rel="stylesheet" href="../static/css/overviewStyles.css">
+  <link rel="stylesheet" href="../static/css/loginPageStyles.css">
 
 </head>
 
 <body>
-  <header>
-  </header>
-  <form method="POST">
-  <p>Create User:</p>
-  {{ username }}
-  <p>with password:</p>
-  {{ password }}
-  <p>?</p>
-  <input type="submit">
+  <form action="{{ url_for('createUser') }}" method="POST">
+  <div class="centerBox">
+    <h1>SpendFriends</h1>
+    <div class="loginBox">
+      <p>Create User</p>
+      <p>Username:</p>
+      <input name="username"><br><br>
+      <p>Password:</p>
+      <input name="password" type="password"><br><br>
+      <input type="submit" value="create">
+    </div>
+  </div>
 </form>
-  <script src="js/scripts.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="../static/scripts/loginPage.js"></script>
 </body>
 
 </html>

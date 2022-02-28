@@ -1,9 +1,10 @@
-// starts jquery actions when DOM is ready
-$(document).ready(function () {
-    // when search button is clicked
-    $('.transactionHeader > *').click(function () {
-    $('.transactionHeader > *').css("background-color", "#d0bce3")
-    $(this).css("background-color", "#a783c9")
-    });
+document.addEventListener('DOMContentLoaded', function () {
+var buttonList = document.querySelectorAll(".button")
+buttonList[0].addEventListener("click", function() {
+console.log("CLICK")
+})
 
-  });
+
+
+
+});

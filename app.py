@@ -2,7 +2,6 @@
 '''
 this script creates a page to return hello hbnb
 '''
-from cmath import exp
 from urllib import request, response
 import uuid
 from flask import Flask, render_template, redirect, url_for, make_response
@@ -25,25 +24,46 @@ cur = con.cursor()
 def redirectToLogin():
     return redirect('/loginPage')
 
-@app.route('/loginPage', strict_slashes=False)
+@app.route('/loginPage', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def loginPage():
     '''This method creates a route and gives it some text'''
-    return render_template('loginPage.html')
+    # going to page
+    if rq.method == 'GET':
+        return render_template('loginPage.html')
 
-@app.route('/loginPage', strict_slashes=False, methods=['POST'])
-def loginPagePost():
-    '''This method creates a route and gives it some text'''
-    response = make_response(redirect(url_for('homePage')))
-    response.set_cookie('username', rq.form['username'])
-    response.set_cookie('password', rq.form['password'])
-    response.set_cookie('user_id', cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0])
-    if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall() == []:
-        return redirect('/loginPage/createUser/'.format(rq.form['username'], rq.form['password']))
-    else:
-        if cur.execute('SELECT * FROM users WHERE username = "{}" AND password = "{}"'.format(rq.form['username'], rq.form['password'])).fetchall() == []:
-            return "Invalid Password!"
+    # logging in
+    elif rq.method == 'POST':
+        response = make_response(redirect(url_for('homePage')))
+        response.set_cookie('username', rq.form['username'])
+        response.set_cookie('password', rq.form['password'])
+        if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall() == []:
+            return "Invalid User!"
         else:
+            if cur.execute('SELECT * FROM users WHERE username = "{}" AND password = "{}"'.format(rq.form['username'], rq.form['password'])).fetchall() == []:
+                return "Invalid Password!"
+            else:
+                response.set_cookie('user_id', cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0])
+                return response
+
+
+
+@app.route('/createUser', strict_slashes=False, methods=['GET', 'POST'])
+def createUser():
+    # creating user
+    if rq.method == 'GET':
+        return render_template('createUser.html')
+    if rq.method == 'POST':
+        response = make_response(redirect(url_for('homePage')))
+        response.set_cookie('username', rq.form['username'])
+        response.set_cookie('password', rq.form['password'])
+        if cur.execute('SELECT * FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall() != []:
+            return "User already exists!"
+        else:
+            cur.execute("INSERT INTO users VALUES ('{}', '{}', '{}', '{}', '{}', '{}')".format(rq.form['username'], rq.form['password'], str(uuid.uuid4()), json.dumps([]), json.dumps([]), json.dumps([])))
+            response.set_cookie('user_id', cur.execute('SELECT user_id FROM users WHERE username = "{}"'.format(rq.form['username'])).fetchall()[0][0])
+            con.commit()
             return response
+
 
 @app.route('/overview', strict_slashes=False)
 def homePage():
@@ -184,22 +204,6 @@ def addListIncomePost(listName):
 def settingsPage():
     '''This method creates a route and gives it some text'''
     return render_template('settings.html')
-
-@app.route('/loginPage/createUser', strict_slashes=False)
-def createUser():
-    '''displays info from SQLite about user'''
-    username = rq.cookies.get('username')
-    password = rq.cookies.get('password')
-    return render_template("createUser.html", username=username, password=password)
-
-@app.route('/loginPage/createUser', methods=['POST'], strict_slashes=False)
-def createUserPost():
-    '''displays info from SQLite about user'''
-    username = rq.cookies.get('username')
-    password = rq.cookies.get('password')
-    cur.execute("INSERT INTO users VALUES ('{}','{}', '{}', '', '{}', '{}', '{}', '')".format(username, password, str(uuid.uuid4()), json.dumps([]), json.dumps([]), json.dumps([])))
-    con.commit()
-    return redirect('/overview')
 
 
 

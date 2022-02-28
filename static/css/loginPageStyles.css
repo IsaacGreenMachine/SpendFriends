@@ -13,11 +13,15 @@
     transform: translate(-50%, -50%);
 }
 
+.centerBox > * {
+    margin-bottom: 40px;
+}
+
 .loginBox {
     background-color: #a783c9;
     width: 60%;
     max-width: 300px;
-    margin: 0 auto;
+    margin: 40px auto;
     padding: 30px;
 }
 
@@ -32,4 +36,22 @@ h1 {
 
 input {
     color:black;
+}
+
+.button {
+    height: 40px;
+    width: auto;
+    border-radius: 10px;
+    background-color: #a783c9;
+}
+
+.button:active {
+    background-color: #6a448e;
+}
+
+.button > * {
+    color: #f6f6f6;
+    margin: 0;
+    text-align: center;
+    padding-top: 7px;
 }
