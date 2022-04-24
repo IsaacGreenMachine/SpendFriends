@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>SpendFriends</title>
-  <link rel="stylesheet" href="../static/css/overviewStyles.css">
+  <link rel="stylesheet" href="../static/css/listsStyles.css">
 </head>
 
 <body>
@@ -17,18 +17,22 @@
     <p><a href={{url_for('listsPage')}}>Lists</a></p>
     <p><a href={{url_for('settingsPage')}}>Settings</a></p>
   </header>
-  <h2>Lists:</h2>
-  {% for list in lists %}
-  <p><a href={{url_for('listData', listName=list[0]) }}>{{ list[0] }}</a><p>
-  {% endfor %}
-  <form method="POST">
-    <h2>Add List:</h2>
-    <p>List Name:</p>
-    <input name="listName"><br><br>
-    <input type="submit">
-  </form>
 
-  <script src="js/scripts.js"></script>
+  <div class="middleColumnContainer">
+    <div class="menuBar">Lists</div>
+    <div class="listsContainer"></div>
+    <form method="POST">
+      <h2 class="addList">Add List</h2>
+      <div class="newListInput">
+        <p>List Name:</p>
+        <input name="listName"><br><br>
+        <input type="submit">
+      </div>
+    </form>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../static/scripts/lists.js"></script>
 </body>
 
 </html>

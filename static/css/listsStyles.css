@@ -1,0 +1,91 @@
+* {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #f6f6f6;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+    column-gap: 20px;
+    height: 60px;
+    padding: 0;
+    background-color: #a783c9;
+}
+
+.middleColumnContainer {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    width: 60%;
+    min-width: 500px;
+}
+
+.menuBar {
+    margin-top: 40px;
+    background-color: #a783c9;
+    height: 40px;
+    width: 100%;
+    border-radius: 10px;
+    border: solid black 6px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+body {
+    background-color: #cbf5d5;
+}
+
+.friends {
+    margin-left: auto;
+}
+
+input {
+    color: black;
+}
+
+.listItem {
+    background-color: #d0bce3;
+    width: 100%;
+    height: 60px;
+    border: solid black;
+    border-width: 3px 6px;
+    text-align: center;
+    color: #f6f6f6;
+}
+
+.addList {
+    background-color: #d0bce3;
+    border-radius: 10px;
+    border: solid black 6px;
+    height: 30px;
+    width: 20%;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.addList:hover {
+    text-decoration: underline;
+}
+
+form {
+    width: 100%
+}
+
+.newListInput {
+    background-color: #d0bce3;
+    visibility: hidden;
+}
+
+.listsContainer {
+    height: auto;
+    border-width: 0;
+    margin-left: -12px;
+    margin-top: 10px;
+    width: 100%;
+}
