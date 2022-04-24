@@ -9,26 +9,32 @@
   <title>SpendFriends</title>
 
   <link rel="stylesheet" href="../static/css/overviewStyles.css">
+  <link rel="stylesheet" href="../static/css/friendsStyles.css">
 
 </head>
 
 <body>
   <header>
     <p><a href={{url_for('homePage')}}>SpendFriends</a></p>
-    <p><a href={{url_for('friendsPage')}}>Friends</a></p>
-    <p><a href={{url_for('listsPage')}}>Lists</a></p>
-    <p><a href={{url_for('settingsPage')}}>Settings</a></p>
+    <a href={{url_for('friendsPage')}} class="friends"><img src="../static/images/FriendsLogo.png" alt="Friends" style="width:40px;height:40px;"></a>
+    <a href={{url_for('listsPage')}}><img src="../static/images/listsLogo.png" alt="Lists" style="width:40px;height:40px;"></a>
+    <a href={{url_for('settingsPage')}} class="profile"><img src="../static/images/settingsLogo.png" alt="Settings" style="width:40px;height:40px;"></a>
   </header>
   <p>Friends List:</p>
   {% for i in friendsInfo %}
   <p>{{ i.get('username') }}</p>
   {% endfor %}
-  <form method="POST">
-    <p>Add Friends!</p>
+
+  <p class="title">Friends</p>
+
+  <div class="friends"></div>
+
+  <form class="addFriend" method="POST" onclick="addFriend(event)">
     <p>Friend's Username:</p>
-    <input name="friendUserName"><br><br>
-    <input type="submit">
+    <input name="friendUserName" id="friendUserName"><br><br>
+    <input type="submit" value="Add Friend">
   </form>
+
   <script src="js/scripts.js"></script>
 </body>
 
